@@ -1,1 +1,90 @@
-readme
+interview questions on config server:
+
+When preparing for an interview focused on Spring Cloud Config Server, you might encounter scenario-based questions that test your understanding of how to effectively use and troubleshoot the Config Server in various real-world situations. Here are some examples of such questions along with their explanations:
+
+### 1. **Scenario: Adding a New Configuration Property**
+
+**Question:** *You have a microservice that requires a new configuration property to be added. Describe the steps you would take to add this new property and make sure it’s available to all instances of your microservice.*
+
+**Answer:**
+
+1. **Update the Configuration Repository**: Add the new property to the appropriate configuration file in your version control system (e.g., `application.yml` in a Git repository). For instance:
+    ```yaml
+    my-service:
+      new-property: "new-value"
+    ```
+
+2. **Commit Changes**: Commit and push these changes to your Git repository.
+
+3. **Trigger a Refresh**: Depending on your setup:
+   - **Manual Refresh**: Use the `/actuator/refresh` endpoint to manually refresh the configuration in the running microservices.
+   - **Automatic Refresh**: If you have Spring Cloud Bus configured, you can send a refresh event to all instances of your microservice using a message broker (e.g., RabbitMQ or Kafka) to automatically apply the new configuration.
+
+4. **Verify**: Check that the new property is correctly applied by verifying the application's logs or the configuration endpoint.
+
+### 2. **Scenario: Config Server Downtime**
+
+**Question:** *What would happen if the Config Server becomes unavailable? How would you handle such a situation to ensure minimal impact on your applications?*
+
+**Answer:**
+
+1. **Impact**: If the Config Server is down, applications that depend on it will fail to fetch configuration data. This could lead to application startup failures or unexpected behavior if the configuration is required for critical initialization.
+
+2. **Handling Downtime**:
+   - **Fallback Mechanism**: Implement a fallback mechanism in your applications to use default values if the Config Server is unavailable.
+   - **Failover Strategies**: Set up a secondary Config Server instance or use a load balancer to distribute traffic between multiple instances of the Config Server to ensure high availability.
+   - **Monitoring and Alerts**: Monitor the Config Server’s health and set up alerts to be notified of downtime quickly so that corrective action can be taken.
+
+### 3. **Scenario: Configuration Change Propagation**
+
+**Question:** *You’ve updated a configuration property in the Config Server, but the change is not reflected in your applications. What could be the reasons, and how would you troubleshoot the issue?*
+
+**Answer:**
+
+1. **Possible Reasons**:
+   - **Caching**: Some applications might cache configuration values, so changes might not be immediately visible.
+   - **Configuration Profile**: Ensure that the application is using the correct profile and environment. The updated configuration might be in a different profile than what the application is configured to use.
+   - **Refresh Mechanism**: The application might not be using a refresh mechanism, so it hasn’t picked up the new configuration.
+
+2. **Troubleshooting Steps**:
+   - **Check Logs**: Review the logs of the Config Server and the application to identify any errors or issues related to fetching the configuration.
+   - **Verify Configuration Endpoint**: Use the `/actuator/env` endpoint (if available) to check the current configuration values that the application is using.
+   - **Manual Refresh**: Trigger a manual refresh of the configuration to see if the changes are picked up.
+   - **Configuration Source**: Confirm that the configuration repository and files are correctly updated and that the Config Server is pointing to the right source.
+
+### 4. **Scenario: Encrypting Sensitive Configuration Data**
+
+**Question:** *How would you handle sensitive configuration data in your Config Server, such as API keys or passwords?*
+
+**Answer:**
+
+1. **Encrypt Data**: Use Spring Cloud Config’s support for encryption and decryption. Configure the Config Server to use encryption and decryption keys to secure sensitive properties.
+
+2. **Configuration**:
+   - **Define Encryption Keys**: Configure encryption keys in the `application.yml` or `bootstrap.yml` of the Config Server.
+   - **Encrypt Properties**: Use the `encrypt` endpoint to encrypt sensitive properties before storing them in the repository.
+   - **Store Encrypted Values**: Store the encrypted values in the configuration repository.
+
+3. **Access Control**: Ensure that only authorized services can decrypt the sensitive data by setting up appropriate access controls and permissions.
+
+4. **Test**: Verify that sensitive properties are correctly encrypted and decrypted in your applications.
+
+### 5. **Scenario: Migrating Configuration Repositories**
+
+**Question:** *You need to migrate configuration data from a file-based repository to a Git-based repository. How would you approach this migration?*
+
+**Answer:**
+
+1. **Prepare the Git Repository**: Set up a Git repository and structure it to match the configuration format expected by your Config Server.
+
+2. **Migrate Configuration**: Transfer configuration files from the file system to the Git repository, maintaining the same structure and naming conventions.
+
+3. **Update Config Server**:
+   - **Change Configuration**: Update the Config Server’s configuration to point to the new Git repository instead of the file system.
+   - **Verify Access**: Ensure the Config Server can access and read from the Git repository.
+
+4. **Test Configurations**: Test the Config Server and applications to ensure they correctly fetch configurations from the new repository.
+
+5. **Rollback Plan**: Have a rollback plan in case there are issues during the migration.
+
+These questions and answers should help you prepare for interviews where understanding practical, scenario-based applications of Spring Cloud Config Server is crucial.
